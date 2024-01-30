@@ -1,0 +1,17 @@
+# Arguments
+ARG ALPINE_VERSION="3.19.1"
+
+# Stage 1: BUILD
+FROM alpine:${ALPINE_VERSION} as BUILD
+# ARG GO_VERSION="1.21.6" # For some reason, the arg is working locally but not on github actions...
+# RUN wget https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz \
+#     && tar -C /usr/local -xzf go${GO_VERSION}.linux-amd64.tar.gz
+RUN wget https://go.dev/dl/go1.21.6.linux-amd64.tar.gz \
+    && tar -C /usr/local -xzf go1.21.6.linux-amd64.tar.gz
+RUN apk update && apk upgrade && apk add git
+RUN git clone https://github.com/Leikt/waster.git && cd waster && /usr/local/go/bin/go build
+
+# Stage 2: LIGHT WEIGHT EXECUTABLE
+FROM scratch
+COPY --from=build /waster/waster ./waster
+ENTRYPOINT ["./waster"]

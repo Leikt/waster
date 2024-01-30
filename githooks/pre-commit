@@ -1,0 +1,19 @@
+#!/bin/bash
+
+exit 0
+
+echo "Checking protected branches..."
+
+PROTECTED_BRANCHES=(
+    "master"
+    "development"
+)
+branch="$(git rev-parse --abbrev-ref HEAD)"
+
+for protected_branch in $PROTECTED_BRANCHES; do
+    if [[ "$protected_branch" = "$branch" ]]; then
+        echo "You are trying to commit on a protected branch: $protected_branch"
+        exit 1
+    fi
+done
+
